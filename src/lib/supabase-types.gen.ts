@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.1"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -287,6 +312,39 @@ export type Database = {
           },
         ]
       }
+      proposals: {
+        Row: {
+          created_at: string
+          discussion: string
+          functionalities: string
+          id: number
+          objectives: Json
+          title: string
+          user_id: string | null
+          voting_period_id: string
+        }
+        Insert: {
+          created_at?: string
+          discussion: string
+          functionalities: string
+          id?: number
+          objectives: Json
+          title: string
+          user_id?: string | null
+          voting_period_id: string
+        }
+        Update: {
+          created_at?: string
+          discussion?: string
+          functionalities?: string
+          id?: number
+          objectives?: Json
+          title?: string
+          user_id?: string | null
+          voting_period_id?: string
+        }
+        Relationships: []
+      }
       rounds: {
         Row: {
           description: string
@@ -312,7 +370,7 @@ export type Database = {
         Row: {
           card_types: string[]
           character: Json
-          character_search: unknown | null
+          character_search: unknown
           created_at: string
           full_story: string
           id: number
@@ -325,7 +383,7 @@ export type Database = {
         Insert: {
           card_types?: string[]
           character: Json
-          character_search?: unknown | null
+          character_search?: unknown
           created_at?: string
           full_story: string
           id?: number
@@ -338,7 +396,7 @@ export type Database = {
         Update: {
           card_types?: string[]
           character?: Json
-          character_search?: unknown | null
+          character_search?: unknown
           created_at?: string
           full_story?: string
           id?: number
@@ -398,17 +456,17 @@ export type Database = {
         Returns: undefined
       }
       create_game: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["CompositeTypes"]["create_game_result"]
+        SetofOptions: {
+          from: "*"
+          to: "create_game_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      generate_story_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      join_game: {
-        Args: { game_code: string }
-        Returns: undefined
-      }
+      generate_story_id: { Args: never; Returns: string }
+      join_game: { Args: { game_code: string }; Returns: undefined }
       mark_player_inactive_by_user: {
         Args: { game_code: string; p_user_id: string }
         Returns: undefined
@@ -417,29 +475,38 @@ export type Database = {
         Args: { answer: string; game_code: string; game_round: number }
         Returns: undefined
       }
-      player_move: {
-        Args:
-          | {
+      player_move:
+        | {
+            Args: { game_code: string; game_round: number; stop_id: number }
+            Returns: number
+          }
+        | {
+            Args: {
               game_code: string
               game_round: number
               p_character_category: string
               p_hero_step: number
               stop_id: number
             }
-          | { game_code: string; game_round: number; stop_id: number }
-        Returns: number
-      }
+            Returns: number
+          }
       player_start: {
         Args: { game_code: string; stop_id: number }
         Returns: undefined
       }
-      roll_dice: {
-        Args: { p_game_id: number }
-        Returns: number
-      }
-      save_story: {
-        Args:
-          | {
+      roll_dice: { Args: { p_game_id: number }; Returns: number }
+      save_story:
+        | {
+            Args: {
+              p_character: Json
+              p_player_name: string
+              p_rounds: Json
+              p_story_title: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
               p_card_types: string[]
               p_character: Json
               p_full_story: string
@@ -447,18 +514,9 @@ export type Database = {
               p_rounds: Json
               p_story_title: string
             }
-          | {
-              p_character: Json
-              p_player_name: string
-              p_rounds: Json
-              p_story_title: string
-            }
-        Returns: string
-      }
-      start_game: {
-        Args: { game_code: string }
-        Returns: undefined
-      }
+            Returns: string
+          }
+      start_game: { Args: { game_code: string }; Returns: undefined }
       update_player_activity: {
         Args: { game_code: string }
         Returns: undefined
@@ -624,6 +682,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       character_category: ["human", "non-human"],
