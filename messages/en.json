@@ -1,7 +1,7 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"create_game": "Create game",
-	"browse_stories": "Browse other players' stories",
+	"browse_stories": "Browse other participants discussions",
 	"join_game": "Join existing game",
 	"play_game": "Play game",
 	"or": "OR",

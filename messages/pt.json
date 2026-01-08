@@ -2,7 +2,7 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"create_game": "Criar jogo",
 	"join_game": "Entrar no jogo existente",
-	"browse_stories": "Ver histórias de outros jogadores",
+	"browse_stories": "Ver discussões de outros participantes",
 	"play_game": "Jogar",
 	"story": "História",
 	"cards_drawn": "Cartas tiradas",

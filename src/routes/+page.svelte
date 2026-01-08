@@ -85,10 +85,10 @@
 			<img src="/images/illustrations/step_2_1.png" alt="" class="w-full h-full object-contain" />
 		</div>
 		<h1 class="flex items-center justify-center text-dark-green font-black text-5xl md:text-7xl">
-			LoGaCulture
+			ZoopDAO
 		</h1>
 		<p class="text-dark-green text-center text-lg mb-5 px-4 italic">
-			"Create your own story from the perspective of a character in the island of Madeira."
+			"Participate on the multispecies governance in Aquário Vasco da Gama"
 		</p>
 		<div
 			class="w-full flex flex-col items-stretch justify-center gap-6 mt-4 p-4 rounded-lg border-2"
