@@ -8,6 +8,7 @@
 	import { localizeUrl } from '@src/paraglide/runtime.js';
 	import clickSound from '@/sounds/click.mp3';
 	import { onMount } from 'svelte';
+	import { getVotingPeriods } from '$lib/data/voting-periods';
 
 	// Theory of Change data structure
 	type IndicativeStep = { id: string; value: string };
@@ -49,6 +50,10 @@
 	let functionalities = $state('');
 	let discussion = $state('');
 	let votingPeriod = $state('');
+
+	// Get voting periods for current year only
+	const currentYear = new Date().getFullYear();
+	const votingPeriods = getVotingPeriods(currentYear);
 
 
 
@@ -246,7 +251,9 @@
 						class="border-dark-green bg-white ring-offset-white focus-visible:ring-dark-green flex h-10 w-full rounded-md border px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
 					>
 						<option value="">{m.select_voting_period()}</option>
-						<!-- TODO: Add voting periods in ZD-154 -->
+						{#each votingPeriods as period}
+							<option value={period.id}>{period.label}</option>
+						{/each}
 					</select>
 				</div>
 
