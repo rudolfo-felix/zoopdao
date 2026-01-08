@@ -94,7 +94,7 @@
 			class="w-full flex flex-col items-stretch justify-center gap-6 mt-4 p-4 rounded-lg border-2"
 		>
 			<div class="flex flex-col items-center justify-center">
-				<Button size="lg" onclick={createGame}>{m.start_new_game()}</Button>
+				<Button size="lg" href={localizeUrl('/proposals/new')}>{m.new_proposal()}</Button>
 			</div>
 			<div class="flex items-center gap-4 w-full">
 				<div class="h-px w-full bg-dark-green"></div>

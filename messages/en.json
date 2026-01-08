@@ -206,5 +206,16 @@
 	"island_dialog_heading": "The Island of Madeira",
 	"fun_fact": "Fun Fact",
 	"images_title": "Image gallery",
-	"images_description": "Read brief information and explore images of Madeira's stunning landscapes and rich biodiversity to fuel your imagination."
+	"images_description": "Read brief information and explore images of Madeira's stunning landscapes and rich biodiversity to fuel your imagination.",
+	"new_proposal": "New Proposal",
+	"proposal_title": "Title (Scenario)",
+	"proposal_title_placeholder": "Enter proposal title",
+	"proposal_description": "Description (Theory of Change)",
+	"proposal_description_placeholder": "Enter proposal description...",
+	"theory_of_change_note": "Note: Theory of Change structure will be implemented in the next step",
+	"proposal_discussion": "Discussion",
+	"proposal_discussion_placeholder": "Enter discussion points...",
+	"voting_period": "Voting Period",
+	"select_voting_period": "Select voting period",
+	"submit_proposal": "Submit Proposal"
 }
