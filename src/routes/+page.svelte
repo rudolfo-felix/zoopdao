@@ -1,60 +1,36 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import * as InputCode from '$lib/components/ui/input-code';
 	import { Button } from '@/components/ui/button';
-	import { supabase } from '@/supabase';
 	import { m } from '../paraglide/messages.js';
 	import { setLocale, getLocale, localizeUrl } from '../paraglide/runtime.js';
 	import type { Locale } from '../paraglide/runtime.js';
 	import clickSound from '@/sounds/click.mp3';
-	import typeSound from '@/sounds/typing-sound.mp3';
 	import { onMount } from 'svelte';
+	import { getVotingPeriods } from '$lib/data/voting-periods';
+	
+	let { data } = $props();
 
-	let type_sound: HTMLAudioElement;
 	let click_sound: HTMLAudioElement;
 
 	onMount(() => {
-		type_sound = new Audio(typeSound);
-		type_sound.volume = 0.5; // Set the volume to 50%
 		click_sound = new Audio(clickSound);
-		click_sound.volume = 0.5; // Set the volume to 50%
+		click_sound.volume = 0.5;
 	});
 
-	let code = $state('');
-
-	$effect(() => {
-		// Play typing sound when the code changes
-		if (code.length > 0) {
-			type_sound.currentTime = 0;
-			type_sound.play();
-		}
-		return () => {
-			if (type_sound) {
-				type_sound.pause();
-				type_sound.currentTime = 0;
-			}
-		};
-	});
-
-	async function createGame() {
-		click_sound.play();
-		const { data, error } = await supabase.rpc('create_game');
-		if (error) {
-			console.error(error);
-		} else if (data) {
-			const code = data.game_code;
-			return goto(localizeUrl(`/${code}/lobby`));
-		}
+	const proposals = $derived(data.proposals || []);
+	const currentYear = new Date().getFullYear();
+	const votingPeriods = getVotingPeriods(currentYear);
+	
+	function getVotingPeriodLabel(periodId: string): string {
+		const period = votingPeriods.find(p => p.id === periodId);
+		return period?.label || periodId;
 	}
-
-	async function joinGame() {
+	
+	function handleProposalClick(proposalId: number) {
 		click_sound.play();
-		const { error } = await supabase.rpc('join_game', { game_code: code });
-		if (error) {
-			console.error(error);
-		} else {
-			return goto(localizeUrl(`/${code}/lobby`));
-		}
+		// TODO: Navigate to proposal flow (will be implemented in future stories)
+		// For now, just show an alert
+		alert(`Proposal ${proposalId} clicked - navigation to proposal flow will be implemented`);
 	}
 
 	let selectedLanguage = $state(getLocale()); // Default language
@@ -94,27 +70,37 @@
 			class="w-full flex flex-col items-stretch justify-center gap-6 mt-4 p-4 rounded-lg border-2"
 		>
 			<div class="flex flex-col items-center justify-center">
-				<Button size="lg" href={localizeUrl('/proposals/new')}>{m.new_proposal()}</Button>
+				<Button size="lg" href={localizeUrl('/proposals/new').toString()}>{m.new_proposal()}</Button>
 			</div>
 			<div class="flex items-center gap-4 w-full">
 				<div class="h-px w-full bg-dark-green"></div>
 				<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
 				<div class="h-px w-full bg-dark-green"></div>
 			</div>
+			<!-- Proposals List -->
 			<div class="w-full flex flex-col items-center justify-center gap-2">
-				<p class="flex items-center justify-center text-dark-green font-medium">
-					{m.label_join_game()}
+				<p class="flex items-center justify-center text-dark-green font-medium mb-2">
+					{m.current_proposals()}
 				</p>
-				<InputCode.Root maxlength={6} bind:value={code}>
-					{#snippet children({ cells })}
-						<InputCode.Group>
-							{#each cells as cell}
-								<InputCode.Slot {cell} />
-							{/each}
-						</InputCode.Group>
-					{/snippet}
-				</InputCode.Root>
-				<Button size="lg" class="mt-2" onclick={joinGame}>{m.join_game()}</Button>
+				{#if proposals.length === 0}
+					<p class="text-gray-500 text-sm italic">{m.no_proposals()}</p>
+				{:else}
+					<div class="w-full space-y-2 max-h-64 overflow-y-auto">
+						{#each proposals as proposal}
+							<button
+								onclick={() => handleProposalClick(proposal.id)}
+								class="w-full p-3 bg-white border-2 border-dark-green/20 rounded-lg hover:border-dark-green/60 hover:bg-gray-50 transition-all text-left"
+							>
+								<div class="flex flex-col gap-1">
+									<p class="font-semibold text-dark-green">{proposal.title}</p>
+									<p class="text-xs text-gray-500">
+										{m.voting_period()}: {getVotingPeriodLabel(proposal.voting_period_id)}
+									</p>
+								</div>
+							</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
 			<div class="flex items-center gap-4 w-full">
 				<div class="h-px w-full bg-dark-green"></div>

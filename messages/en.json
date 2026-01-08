@@ -234,5 +234,8 @@
 	"indicator_placeholder": "Enter KPI with audience, target, threshold, and timeline",
 	"functionalities": "Functionalities",
 	"functionalities_placeholder": "Enter functionalities...",
-	"form_validation_error": "Please fill in all required fields"
+	"form_validation_error": "Please fill in all required fields",
+	"proposal_submission_error": "Error submitting proposal. Please try again.",
+	"current_proposals": "Current Proposals",
+	"no_proposals": "No proposals available for the current voting period"
 }

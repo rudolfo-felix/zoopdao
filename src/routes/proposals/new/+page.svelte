@@ -86,15 +86,40 @@
 		goto(localizeUrl('/'));
 	}
 
-	function handleSubmit() {
+	async function handleSubmit() {
 		click_sound.play();
 		if (!validateForm()) {
 			alert(m.form_validation_error());
 			return;
 		}
-		// TODO: Implement proposal submission (ZD-155)
-		// For now, just navigate back
-		goto(localizeUrl('/'));
+		
+		try {
+			const response = await fetch('/api/proposals', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					title,
+					objectives,
+					functionalities,
+					discussion,
+					voting_period_id: votingPeriod
+				})
+			});
+			
+			if (!response.ok) {
+				const error = await response.json();
+				alert(error.error || m.proposal_submission_error());
+				return;
+			}
+			
+			// Success - navigate back to homepage
+			goto(localizeUrl('/'));
+		} catch (error) {
+			console.error('Error submitting proposal:', error);
+			alert(m.proposal_submission_error());
+		}
 	}
 </script>
 

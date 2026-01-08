@@ -234,5 +234,8 @@
 	"indicator_placeholder": "Insira KPI com público-alvo, meta, limite e cronograma",
 	"functionalities": "Funcionalidades",
 	"functionalities_placeholder": "Insira funcionalidades...",
-	"form_validation_error": "Por favor, preencha todos os campos obrigatórios"
+	"form_validation_error": "Por favor, preencha todos os campos obrigatórios",
+	"proposal_submission_error": "Erro ao submeter proposta. Por favor, tente novamente.",
+	"current_proposals": "Propostas Atuais",
+	"no_proposals": "Nenhuma proposta disponível para o período de votação atual"
 }
