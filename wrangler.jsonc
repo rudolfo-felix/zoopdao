@@ -1,0 +1,8 @@
+{
+	"compatibility_date": "2025-01-08",
+	"assets": {
+		"directory": ".svelte-kit/cloudflare",
+		"binding": "ASSETS"
+	}
+}
+
