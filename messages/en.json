@@ -217,5 +217,22 @@
 	"proposal_discussion_placeholder": "Enter discussion points...",
 	"voting_period": "Voting Period",
 	"select_voting_period": "Select voting period",
-	"submit_proposal": "Submit Proposal"
+	"submit_proposal": "Submit Proposal",
+	"theory_of_change": "Theory of Change",
+	"long_term_objectives": "1. Define long-term goals",
+	"long_term_objectives_description": "two per working group",
+	"objective": "Objective",
+	"objective_placeholder": "Enter long-term goal",
+	"preconditions_and_goals": "2. Define preconditions and requirements for those goals",
+	"preconditions_and_goals_description": "two per goal; briefly explain why",
+	"precondition": "Precondition",
+	"precondition_placeholder": "Enter precondition or requirement and explain why",
+	"indicative_steps": "3. Define initial steps",
+	"step_placeholder": "Enter initial step",
+	"key_indicators": "4. Define key-performance indicators",
+	"key_indicators_description": "include audience, target, threshold, and timeline",
+	"indicator_placeholder": "Enter KPI with audience, target, threshold, and timeline",
+	"functionalities": "Functionalities",
+	"functionalities_placeholder": "Enter functionalities...",
+	"form_validation_error": "Please fill in all required fields"
 }

@@ -217,5 +217,22 @@
 	"proposal_discussion_placeholder": "Insira pontos de discussão...",
 	"voting_period": "Período de Votação",
 	"select_voting_period": "Selecione o período de votação",
-	"submit_proposal": "Submeter Proposta"
+	"submit_proposal": "Submeter Proposta",
+	"theory_of_change": "Teoria da Mudança",
+	"long_term_objectives": "1. Definir objetivos a longo prazo",
+	"long_term_objectives_description": "duas por grupo de trabalho",
+	"objective": "Objetivo",
+	"objective_placeholder": "Insira o objetivo de longo prazo",
+	"preconditions_and_goals": "2. Definir pré-condições e requisitos para estas metas",
+	"preconditions_and_goals_description": "duas por objetivo; explicar brevemente o porquê",
+	"precondition": "Pré-condição",
+	"precondition_placeholder": "Insira pré-condição ou requisito e explique o porquê",
+	"indicative_steps": "3. Definir etapas iniciais",
+	"step_placeholder": "Insira etapa inicial",
+	"key_indicators": "4. Definir indicadores-chave de desempenho",
+	"key_indicators_description": " incluir público-alvo, meta, limite e cronograma",
+	"indicator_placeholder": "Insira KPI com público-alvo, meta, limite e cronograma",
+	"functionalities": "Funcionalidades",
+	"functionalities_placeholder": "Insira funcionalidades...",
+	"form_validation_error": "Por favor, preencha todos os campos obrigatórios"
 }
