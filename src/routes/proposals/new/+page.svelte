@@ -5,7 +5,7 @@
 	import { Textarea } from '@/components/ui/textarea';
 	import { X } from 'lucide-svelte';
 	import { m } from '@src/paraglide/messages';
-	import { localizeUrl } from '@src/paraglide/runtime.js';
+	import { localizeUrl, getLocale } from '@src/paraglide/runtime.js';
 	import clickSound from '@/sounds/click.mp3';
 	import { onMount } from 'svelte';
 	import { getVotingPeriods } from '$lib/data/voting-periods';

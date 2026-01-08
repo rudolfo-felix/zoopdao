@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			`june-${currentYear}`,
 			`september-${currentYear}`,
 			`december-${currentYear}`,
-			'january-2026-exceptional' // Exceptional period
+			'january-2026-exceptional' // Exceptional period (adjusted dates for testing)
 		];
 		
 		// If specific period requested, filter by it; otherwise get all current year periods

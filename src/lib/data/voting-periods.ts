@@ -51,8 +51,8 @@ export function getExceptionalVotingPeriods(): VotingPeriod[] {
 	return [
 		{
 			id: 'january-2026-exceptional',
-			label: 'January 12-16, 2026',
-			startDate: new Date(2026, 0, 12),
+			label: 'January 8-16, 2026',
+			startDate: new Date(2026, 0, 8), // Adjusted to include today for testing
 			endDate: new Date(2026, 0, 16)
 		}
 	];

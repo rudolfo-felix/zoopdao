@@ -239,5 +239,9 @@
 	"current_proposals": "Current Proposals",
 	"no_proposals": "No proposals available for the current voting period",
 	"proposal_status_open": "Open",
-	"proposal_status_closed": "Closed"
+	"proposal_status_closed": "Closed",
+	"start_discussion": "Start Discussion",
+	"view_full_proposal": "View Full Proposal",
+	"loading": "Loading...",
+	"theory_of_change": "Theory of Change"
 }

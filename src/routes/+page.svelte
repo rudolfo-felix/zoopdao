@@ -60,9 +60,7 @@
 	
 	function handleProposalClick(proposalId: number) {
 		click_sound.play();
-		// TODO: Navigate to proposal flow (will be implemented in future stories)
-		// For now, just show an alert
-		alert(`Proposal ${proposalId} clicked - navigation to proposal flow will be implemented`);
+		goto(localizeUrl(`/proposals/${proposalId}/preview`).toString());
 	}
 
 	let selectedLanguage = $state(getLocale()); // Default language
