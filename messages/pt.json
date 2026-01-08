@@ -237,5 +237,7 @@
 	"form_validation_error": "Por favor, preencha todos os campos obrigatórios",
 	"proposal_submission_error": "Erro ao submeter proposta. Por favor, tente novamente.",
 	"current_proposals": "Propostas Atuais",
-	"no_proposals": "Nenhuma proposta disponível para o período de votação atual"
+	"no_proposals": "Nenhuma proposta disponível para o período de votação atual",
+	"proposal_status_open": "Aberto",
+	"proposal_status_closed": "Fechado"
 }

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS public.proposals (
     functionalities TEXT NOT NULL,
     discussion TEXT NOT NULL,
     voting_period_id TEXT NOT NULL,
+    language TEXT NOT NULL DEFAULT 'pt', -- Language of the proposal (pt or en)
     user_id UUID REFERENCES auth.users(id),
     CONSTRAINT proposals_title_check CHECK (char_length(title) > 0),
     CONSTRAINT proposals_functionalities_check CHECK (char_length(functionalities) > 0),
@@ -32,11 +33,11 @@ ON public.proposals
 FOR SELECT
 USING (true);
 
--- Policy: Authenticated users can create proposals
-CREATE POLICY "Authenticated users can create proposals"
+-- Policy: Anyone can create proposals (allows anonymous users)
+CREATE POLICY "Anyone can create proposals"
 ON public.proposals
 FOR INSERT
-TO authenticated
+TO anon, authenticated
 WITH CHECK (true);
 
 -- Policy: Users can update their own proposals

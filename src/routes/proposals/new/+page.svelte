@@ -50,8 +50,9 @@
 	let functionalities = $state('');
 	let discussion = $state('');
 	let votingPeriod = $state('');
+	let proposalLanguage = $state(getLocale()); // Default to current locale
 
-	// Get voting periods for current year only
+	// Get voting periods for current year only (excluding exceptional periods)
 	const currentYear = new Date().getFullYear();
 	const votingPeriods = getVotingPeriods(currentYear);
 
@@ -104,7 +105,8 @@
 					objectives,
 					functionalities,
 					discussion,
-					voting_period_id: votingPeriod
+					voting_period_id: votingPeriod,
+					language: proposalLanguage
 				})
 			});
 			

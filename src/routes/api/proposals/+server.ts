@@ -5,15 +5,17 @@ import type { RequestHandler } from './$types';
 // GET: Fetch proposals for current voting period
 export const GET: RequestHandler = async ({ url }) => {
 	try {
+		
 		const votingPeriodId = url.searchParams.get('voting_period_id');
 		const currentYear = new Date().getFullYear();
 		
-		// Get current voting periods
+		// Get current voting periods (including exceptional)
 		const periods = [
 			`march-${currentYear}`,
 			`june-${currentYear}`,
 			`september-${currentYear}`,
-			`december-${currentYear}`
+			`december-${currentYear}`,
+			'january-2026-exceptional' // Exceptional period
 		];
 		
 		// If specific period requested, filter by it; otherwise get all current year periods
@@ -55,12 +57,18 @@ export const GET: RequestHandler = async ({ url }) => {
 // POST: Create a new proposal
 export const POST: RequestHandler = async ({ request }) => {
 	try {
+		
 		const body = await request.json();
-		const { title, objectives, functionalities, discussion, voting_period_id } = body;
+		const { title, objectives, functionalities, discussion, voting_period_id, language = 'pt' } = body;
 		
 		// Validation
 		if (!title || !objectives || !functionalities || !discussion || !voting_period_id) {
 			return json({ error: 'Missing required fields' }, { status: 400 });
+		}
+		
+		// Validate language
+		if (language && !['pt', 'en'].includes(language)) {
+			return json({ error: 'Invalid language. Must be "pt" or "en"' }, { status: 400 });
 		}
 		
 		// Validate objectives structure
@@ -88,7 +96,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 		
-		// Get current user
+		// Get current user (with session from cookies)
 		const { data: { user }, error: userError } = await supabase.auth.getUser();
 		
 		const { data, error } = await supabase
@@ -99,6 +107,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				functionalities,
 				discussion,
 				voting_period_id,
+				language,
 				user_id: user?.id || null
 			})
 			.select()

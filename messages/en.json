@@ -237,5 +237,7 @@
 	"form_validation_error": "Please fill in all required fields",
 	"proposal_submission_error": "Error submitting proposal. Please try again.",
 	"current_proposals": "Current Proposals",
-	"no_proposals": "No proposals available for the current voting period"
+	"no_proposals": "No proposals available for the current voting period",
+	"proposal_status_open": "Open",
+	"proposal_status_closed": "Closed"
 }

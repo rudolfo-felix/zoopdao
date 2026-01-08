@@ -6,7 +6,8 @@
 	import type { Locale } from '../paraglide/runtime.js';
 	import clickSound from '@/sounds/click.mp3';
 	import { onMount } from 'svelte';
-	import { getVotingPeriods } from '$lib/data/voting-periods';
+	import { getVotingPeriods, getExceptionalVotingPeriods, getProposalStatus } from '$lib/data/voting-periods';
+	import { Circle, CheckCircle2 } from 'lucide-svelte';
 	
 	let { data } = $props();
 
@@ -19,11 +20,42 @@
 
 	const proposals = $derived(data.proposals || []);
 	const currentYear = new Date().getFullYear();
-	const votingPeriods = getVotingPeriods(currentYear);
+	const votingPeriods = [...getVotingPeriods(currentYear), ...getExceptionalVotingPeriods()];
+	const currentLocale = $derived(getLocale() as string);
 	
 	function getVotingPeriodLabel(periodId: string): string {
 		const period = votingPeriods.find(p => p.id === periodId);
 		return period?.label || periodId;
+	}
+	
+	function getProposalStatusIcon(status: 'open' | 'closed') {
+		return status === 'open' 
+			? CheckCircle2 
+			: Circle;
+	}
+	
+	function getProposalStatusColor(status: 'open' | 'closed'): string {
+		return status === 'open' 
+			? 'text-green-600' 
+			: 'text-gray-400';
+	}
+	
+	function getProposalStatusText(status: 'open' | 'closed'): string {
+		return status === 'open' 
+			? m.proposal_status_open() 
+			: m.proposal_status_closed();
+	}
+	
+	function translateProposal(proposal: any, targetLang: string): any {
+		// If proposal is already in target language, return as is
+		if (!proposal.language || proposal.language === targetLang) {
+			return proposal;
+		}
+		
+		// For now, return original (translation will be implemented later with translation API/service)
+		// TODO: Implement actual translation logic using translation API or service
+		// This could translate: title, objectives, functionalities, discussion
+		return proposal;
 	}
 	
 	function handleProposalClick(proposalId: number) {
@@ -87,15 +119,26 @@
 				{:else}
 					<div class="w-full space-y-2 max-h-64 overflow-y-auto">
 						{#each proposals as proposal}
+							{@const translatedProposal = translateProposal(proposal, currentLocale)}
+							{@const status = getProposalStatus(proposal.voting_period_id, votingPeriods)}
+							{@const StatusIcon = getProposalStatusIcon(status)}
 							<button
 								onclick={() => handleProposalClick(proposal.id)}
 								class="w-full p-3 bg-white border-2 border-dark-green/20 rounded-lg hover:border-dark-green/60 hover:bg-gray-50 transition-all text-left"
 							>
-								<div class="flex flex-col gap-1">
-									<p class="font-semibold text-dark-green">{proposal.title}</p>
-									<p class="text-xs text-gray-500">
-										{m.voting_period()}: {getVotingPeriodLabel(proposal.voting_period_id)}
-									</p>
+								<div class="flex items-start justify-between gap-2">
+									<div class="flex-1 flex flex-col gap-1">
+										<p class="font-semibold text-dark-green">{translatedProposal.title}</p>
+										<p class="text-xs text-gray-500">
+											{m.voting_period()}: {getVotingPeriodLabel(proposal.voting_period_id)}
+										</p>
+									</div>
+									<div class="flex items-center gap-1" title={getProposalStatusText(status)}>
+										<StatusIcon class={`h-5 w-5 ${getProposalStatusColor(status)}`} />
+										<span class={`text-xs ${getProposalStatusColor(status)}`}>
+											{getProposalStatusText(status)}
+										</span>
+									</div>
 								</div>
 							</button>
 						{/each}

@@ -12,6 +12,8 @@ export type VotingPeriod = {
  * - June 20th to 24th
  * - September 21st to 25th
  * - December 14th to 18th
+ * 
+ * Also includes exceptional periods (not available for new proposals)
  */
 export function getVotingPeriods(year: number = new Date().getFullYear()): VotingPeriod[] {
 	return [
@@ -40,5 +42,37 @@ export function getVotingPeriods(year: number = new Date().getFullYear()): Votin
 			endDate: new Date(year, 11, 18)
 		}
 	];
+}
+
+/**
+ * Get exceptional voting periods (not available for new proposals)
+ */
+export function getExceptionalVotingPeriods(): VotingPeriod[] {
+	return [
+		{
+			id: 'january-2026-exceptional',
+			label: 'January 12-16, 2026',
+			startDate: new Date(2026, 0, 12),
+			endDate: new Date(2026, 0, 16)
+		}
+	];
+}
+
+/**
+ * Check if a proposal is currently open (within voting period)
+ */
+export function isProposalOpen(periodId: string, allPeriods: VotingPeriod[]): boolean {
+	const period = allPeriods.find(p => p.id === periodId);
+	if (!period) return false;
+	
+	const now = new Date();
+	return now >= period.startDate && now <= period.endDate;
+}
+
+/**
+ * Get proposal status (open/closed)
+ */
+export function getProposalStatus(periodId: string, allPeriods: VotingPeriod[]): 'open' | 'closed' {
+	return isProposalOpen(periodId, allPeriods) ? 'open' : 'closed';
 }
 
