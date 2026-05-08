@@ -1,4 +1,5 @@
 import { supabase } from '$lib/supabase';
+import { getExceptionalVotingPeriods, getVotingPeriods } from '$lib/data/voting-periods';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -11,11 +12,8 @@ export const GET: RequestHandler = async ({ url }) => {
 		
 		// Get current voting periods (including exceptional)
 		const periods = [
-			`march-${currentYear}`,
-			`june-${currentYear}`,
-			`september-${currentYear}`,
-			`december-${currentYear}`,
-			'february-2026-exceptional' // Exceptional period (adjusted dates for testing)
+			...getVotingPeriods(currentYear).map((p) => p.id),
+			...getExceptionalVotingPeriods().map((p) => p.id)
 		];
 		
 		// If specific period requested, filter by it; otherwise get all current year periods

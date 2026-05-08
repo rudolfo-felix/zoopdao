@@ -37,9 +37,9 @@ export function getVotingPeriods(year: number = new Date().getFullYear()): Votin
 		},
 		{
 			id: `june-${year}`,
-			label: `June 20-24, ${year}`,
-			startDate: new Date(year, 5, 20),
-			endDate: new Date(year, 5, 24)
+			label: `June 1-30, ${year}`,
+			startDate: new Date(year, 5, 1),
+			endDate: new Date(year, 5, 30)
 		},
 		{
 			id: `september-${year}`,
@@ -61,6 +61,12 @@ export function getVotingPeriods(year: number = new Date().getFullYear()): Votin
  */
 export function getExceptionalVotingPeriods(): VotingPeriod[] {
 	return [
+		{
+			id: 'may-2026-exceptional',
+			label: 'May 1-31, 2026',
+			startDate: new Date(2026, 4, 1),
+			endDate: new Date(2026, 4, 31)
+		},
 		{
 			id: 'february-2026-exceptional',
 			label: 'February 1-28, 2026',
