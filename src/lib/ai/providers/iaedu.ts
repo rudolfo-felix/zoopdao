@@ -398,12 +398,33 @@ function isFatalProviderErrorPayload(errorPayload: unknown): boolean {
 	);
 }
 
+function isRateLimitText(value: string | null | undefined): boolean {
+	const text = stripInvisible(value ?? '').trim();
+	return text === 'Rate limit reached (429)';
+}
+
+function deriveRetryThreadId(baseThreadId: string, attempt: number, startedAt: number): string {
+	if (attempt <= 1) return baseThreadId;
+	const suffix = createHash('sha1')
+		.update(`${baseThreadId}:${attempt}:${startedAt}`)
+		.digest('hex')
+		.slice(0, 8);
+	const extra = `-${suffix}-${attempt}`;
+	const maxLen = 120;
+	let base = baseThreadId;
+	if (base.length + extra.length > maxLen) {
+		base = base.slice(0, Math.max(1, maxLen - extra.length));
+	}
+	return `${base}${extra}`;
+}
+
 export async function generateAIMessageIaedu(
 	request: AiGenerateRequest,
 	options?: { signal?: AbortSignal }
 ): Promise<AiGenerateResult> {
 	const startedAt = Date.now();
 	const debugRaw = isTruthyEnv(env.IAEDU_DEBUG_LOG_RAW);
+	const maxAttempts = 2;
 	const apiKey = IAEDU_API_KEY;
 	if (!apiKey) {
 		return {
@@ -465,19 +486,20 @@ export async function generateAIMessageIaedu(
 		threadSource: dynamicThreadId ? 'request' : 'env',
 		threadSuffix: threadId ? threadId.slice(-8) : null,
 		hasRagContext: Boolean(request.ragContext),
-		endpoint
+		endpoint,
+		maxAttempts
 	});
 
 	try {
-		const maxAttempts = 1;
 		for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
 			if (attempt > 1) {
 				await new Promise((r) => setTimeout(r, 700 * attempt));
 				console.log('[iaedu] retrying', { attempt, elapsedMs: Date.now() - startedAt });
 			}
+			const threadIdForAttempt = deriveRetryThreadId(threadId, attempt, startedAt);
 			const formData = new FormData();
 			formData.append('channel_id', channelId);
-			formData.append('thread_id', threadId);
+			formData.append('thread_id', threadIdForAttempt);
 			formData.append('user_info', userInfo);
 			formData.append('message', prompt);
 
@@ -493,6 +515,14 @@ export async function generateAIMessageIaedu(
 
 			if (!response.ok) {
 				const details = await response.text();
+				if (response.status === 429 && attempt < maxAttempts) {
+					console.log('[iaedu] rate limited (http)', {
+						status: response.status,
+						elapsedMs: Date.now() - startedAt,
+						attempt
+					});
+					continue;
+				}
 				console.log('[iaedu] response error', {
 					status: response.status,
 					elapsedMs: Date.now() - startedAt,
@@ -514,7 +544,8 @@ export async function generateAIMessageIaedu(
 				status: response.status,
 				elapsedMs: Date.now() - startedAt,
 				rawLength: rawText.length,
-				attempt
+				attempt,
+				threadSuffix: threadIdForAttempt ? threadIdForAttempt.slice(-8) : null
 			});
 			const { content, error, diagnostics } = parseIaeduResponse(rawText);
 			console.log('[iaedu] parsed', {
@@ -577,6 +608,25 @@ export async function generateAIMessageIaedu(
 					error: {
 						code: 'provider_error',
 						message: 'IAEDU returned an empty response.',
+						provider: 'iaedu'
+					}
+				};
+			}
+
+			// IAEDU sometimes returns rate-limit info as "content" instead of an HTTP 429.
+			if (isRateLimitText(content)) {
+				console.log('[iaedu] rate limited (content)', {
+					elapsedMs: Date.now() - startedAt,
+					attempt,
+					threadSuffix: threadIdForAttempt ? threadIdForAttempt.slice(-8) : null
+				});
+				if (attempt < maxAttempts) continue;
+				return {
+					success: false,
+					error: {
+						code: 'rate_limited',
+						message: 'IAEDU rate limit reached.',
+						details: content,
 						provider: 'iaedu'
 					}
 				};
