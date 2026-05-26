@@ -63,9 +63,9 @@ export function getExceptionalVotingPeriods(): VotingPeriod[] {
 	return [
 		{
 			id: 'may-2026-exceptional',
-			label: 'May 1-31, 2026',
+			label: 'May 1- June 10, 2026',
 			startDate: new Date(2026, 4, 1),
-			endDate: new Date(2026, 4, 31)
+			endDate: new Date(2026, 5, 10)
 		},
 		{
 			id: 'february-2026-exceptional',

@@ -430,16 +430,15 @@
 				×
 			</button>
 			<div
-				class="h-full w-full rounded-full flex items-center justify-center"
-				style={`padding:${computePadding(circleDiameter)}px;`}
+				class="h-full w-full rounded-full flex items-center justify-center p-5"
 			>
 				<div
-					class="w-full h-full overflow-auto text-[length:var(--circle-font)] leading-snug"
+					class="max-w-[80%] text-center overflow-hidden"
 					style={`--circle-font:${computeFontSize(circleDiameter, lastText.length)}px;`}
 					lang={docLang}
 				>
 					<div
-						class="text-justify text-white"
+						class="text-sm leading-relaxed text-white"
 						style="text-justify: inter-word; text-align-last: center; hyphens: auto; word-break: normal; overflow-wrap: break-word;"
 					>
 						{lastText}

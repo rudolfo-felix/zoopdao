@@ -569,12 +569,12 @@
 		const remaining = userPromptRemainingRound7;
 		if (userPromptUsedCountRound7 <= 0) {
 			return isPt
-				? `Tens ${round7PromptLimit} prompts`
-				: `You have ${round7PromptLimit} prompts.`;
+				? `Pode enviar-me ${round7PromptLimit} mensagens`
+				: `You can send ${round7PromptLimit} messages.`;
 		}
 		return isPt
-			? `Prompts restantes: ${remaining}/${round7PromptLimit}.`
-			: `Prompts left: ${remaining}/${round7PromptLimit}.`;
+			? `Mensagens restantes: ${remaining}/${round7PromptLimit}.`
+			: `Messages left: ${remaining}/${round7PromptLimit}.`;
 	});
 
 	const aiIsThinking = $derived.by(() => typingAgents.size > 0);
