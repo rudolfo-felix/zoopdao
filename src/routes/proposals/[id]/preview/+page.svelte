@@ -489,10 +489,10 @@
 					{#if status === 'open'}
 						<div class="md:col-span-2 bg-white border border-deep-teal/20 rounded-lg p-4 md:p-6">
 							<div class="mb-4">
-								<p class="text-sm font-semibold text-deep-teal uppercase tracking-wide">
+								<p class="text-sm font-semibold text-deep-teal uppercase tracking-wide whitespace-pre-line">
 									{getLocale() === 'pt'
-										? 'Vota já ou depois da discussão'
-										: 'Vote now or after the discussion'}
+										? 'Vota já ou depois da discussão\nsó podes votar 1 vez'
+										: 'Vote now or after the discussion\nyou only can vote once'}
 								</p>
 							</div>
 

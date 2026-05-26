@@ -80,7 +80,7 @@
 				}`}
 			>
 				<span
-					class={`block whitespace-pre-line break-words text-pretty leading-snug ${showMore && !expanded ? 'line-clamp-10' : ''}`}
+					class={`block whitespace-pre-line break-words leading-7 text-[15px] text-zinc-700 ${showMore && !expanded ? 'line-clamp-10' : ''}`}
 				>
 					{card.text}
 				</span>

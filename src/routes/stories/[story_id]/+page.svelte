@@ -226,7 +226,7 @@
 					<span class="font-bold text-black"> {getVoteLabel((story as any).vote ?? null)}</span>
 				</p>
 				<p class="text-lg">
-					<span class="text-gray-500">{getLocale() === 'pt' ? 'Participante' : 'Participant'}:</span>
+					<span class="text-gray-500">{getLocale() === 'pt' ? 'Participante' : 'NA'}:</span>
 					<span class="font-bold text-black"> {story.player_name}</span>
 				</p>
 				{#if story.character.description?.trim()}
