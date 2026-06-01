@@ -16,6 +16,7 @@
 	import { supabase } from '@/supabase';
 	import { getDiscussionMessages } from '@/utils/discussion-messages';
 	import { ZOOP_THEME_ASSET_PREFIX } from '$lib/config/theme';
+	import { ROUNDS } from '$lib/data/rounds';
 	import { User } from 'lucide-svelte';
 
 	let audio: HTMLAudioElement | null = null;
@@ -687,7 +688,7 @@
 														<div
 															class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
 														>
-															<span>{m.intro()}</span>
+															<span>{getTranslation(ROUNDS[answer.round]?.title)}</span>
 														</div>
 													{:else if answer.round === 7}
 														<div
@@ -699,8 +700,7 @@
 														<div
 															class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
 														>
-															<span>{m.round()}</span>
-															<span>{answer.round}</span>
+															<span>{getTranslation(ROUNDS[answer.round]?.title)}</span>
 														</div>
 														<p class="text-sm text-gray-500 italic break-words whitespace-pre-wrap">
 															"{getCardText(answer.player_id, answer.round)}"
@@ -739,35 +739,32 @@
 														onclick={() =>
 															toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
 													>
-														{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
-															<div class="flex gap-4 mb-2 animate-fade-in">
-																{#if answer.round === 0}
-																	<div
-																		class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
-																	>
-																		<span>{m.intro()}</span>
-																	</div>
-																{:else if answer.round === 7}
-																	<div
-																		class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
-																	>
-																		<span>{m.post_story()}</span>
-																	</div>
-																{:else}
-																	<div
-																		class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
-																	>
-																		<span>{m.round()}</span>
-																		<span>{answer.round}</span>
-																	</div>
-																	<p
-																		class="text-sm text-gray-500 italic break-words whitespace-pre-wrap"
-																	>
-																		"{getCardText(answer.player_id, answer.round)}"
-																	</p>
-																{/if}
-															</div>
-														{/if}
+														<div class="flex gap-4 mb-2 animate-fade-in">
+															{#if answer.round === 0}
+																<div
+																	class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
+																>
+																	<span>{getTranslation(ROUNDS[answer.round]?.title)}</span>
+																</div>
+															{:else if answer.round === 7}
+																<div
+																	class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
+																>
+																	<span>{m.post_story()}</span>
+																</div>
+															{:else}
+																<div
+																	class="flex gap-1 items-start text-sm font-semibold text-deep-teal"
+																>
+																	<span>{getTranslation(ROUNDS[answer.round]?.title)}</span>
+																</div>
+																<p
+																	class="text-sm text-gray-500 italic break-words whitespace-pre-wrap"
+																>
+																	"{getCardText(answer.player_id, answer.round)}"
+																</p>
+															{/if}
+														</div>
 														<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
 															{answer.answer}
 														</p>

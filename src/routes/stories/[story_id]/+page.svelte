@@ -251,7 +251,7 @@
 
 	<div class="flex items-center gap-4 my-4">
 		<div class="h-[1px] flex-1 bg-gray-200"></div>
-		<h2 class="text-xl font-medium text-deep-teal">{m.story()}</h2>
+		<h2 class="text-xl font-medium text-deep-teal">{m.post_story()}</h2>
 		<div class="h-[1px] flex-1 bg-gray-200"></div>
 	</div>
 	<div class="flex items-center justify-center w-full mb-8">
@@ -284,6 +284,9 @@
 
 					<div class="flex-1 max-w-[75ch]">
 						{#if round.roundNumber === 7}
+							<h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-deep-teal text-opacity-70">
+								{m.post_story()}
+							</h3>
 							{@const msgs = splitChatMessages(round.answer)}
 							{#if msgs.length > 3}
 								<div class="max-h-56 overflow-y-scroll pr-2 space-y-3">
@@ -299,12 +302,21 @@
 								</div>
 							{/if}
 						{:else}
+							{#if round.roundNumber === 0}
+								<h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-deep-teal text-opacity-70">
+									{getTranslation(ROUNDS[0]?.title)}
+								</h3>
+							{:else}
+								<h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-deep-teal text-opacity-70">
+									{getTranslation(ROUNDS[round.roundNumber]?.title)}
+								</h3>
+							{/if}
 							<p class="text-pretty whitespace-pre-wrap break-words">{round.answer}</p>
 						{/if}
 						{#if getProposalPointsForRound(round.roundNumber).length > 0}
 							<div class="mt-3 rounded-lg border border-deep-teal border-opacity-10 bg-gray-50 px-4 py-3">
 								<p class="text-xs font-semibold uppercase tracking-wide text-deep-teal text-opacity-70">
-									{m.proposal_points()}
+									{getTranslation(ROUNDS[round.roundNumber]?.title)}
 								</p>
 								<ul class="mt-2 list-disc pl-5 text-sm text-gray-700 space-y-1">
 									{#each getProposalPointsForRound(round.roundNumber) as point}
@@ -333,9 +345,6 @@
 								<div class="w-8 h-8 rounded-full bg-[#FF6157] bos-accent-bg grid place-items-center">
 									<Flag class="w-4 h-4 text-white flex items-center justify-center" />
 								</div>
-								<span class="font-medium text-center text-base flex items-center justify-center">
-									{m.intro()}
-								</span>
 							</div>
 							{#if getProposalTextForRound(0)}
 								<Card
@@ -389,9 +398,6 @@
 											>
 												{round.round}
 											</div>
-											<span class="font-medium text-center text-base">
-												{getTranslation(roundDetails?.title)}
-											</span>
 										</div>
 
 										{#if displayCard}
