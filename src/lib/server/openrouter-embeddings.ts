@@ -1,33 +1,17 @@
-import { OpenAIEmbeddings } from '@langchain/openai';
+import { HuggingFaceInferenceEmbeddings } from '@langchain/community/embeddings/hf';
 import { env } from '$env/dynamic/private';
 
-const DEFAULT_EMBEDDING_MODEL = env.OPENROUTER_EMBEDDING_MODEL || 'baai/bge-m3';
-const DEFAULT_BASE_URL = env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
+const DEFAULT_EMBEDDING_MODEL = env.API_EMBEDDING_MODEL || 'BAAI/bge-m3';
 
-function buildOpenRouterHeaders() {
-	const headers: Record<string, string> = {};
-	if (env.OPENROUTER_SITE_URL) {
-		headers['HTTP-Referer'] = env.OPENROUTER_SITE_URL;
-	}
-	if (env.OPENROUTER_APP_NAME) {
-		headers['X-Title'] = env.OPENROUTER_APP_NAME;
-	}
-	return headers;
-}
-
-export function createOpenRouterEmbeddings() {
-	if (!env.OPENROUTER_API_KEY) {
-		throw new Error('OPENROUTER_API_KEY is not configured.');
+export function createHuggingFaceEmbeddings() {
+	const apiKey = env.HF_TOKEN || env.HUGGINGFACEHUB_API_KEY;
+	if (!apiKey) {
+		throw new Error('HF_TOKEN is not configured.');
 	}
 
-	return new OpenAIEmbeddings(
-		{
-			model: DEFAULT_EMBEDDING_MODEL,
-			apiKey: env.OPENROUTER_API_KEY
-		},
-		{
-			baseURL: DEFAULT_BASE_URL,
-			defaultHeaders: buildOpenRouterHeaders()
-		}
-	);
+	return new HuggingFaceInferenceEmbeddings({
+		model: DEFAULT_EMBEDDING_MODEL,
+		apiKey,
+		provider: 'hf-inference'
+	});
 }

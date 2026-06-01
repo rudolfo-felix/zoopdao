@@ -1,7 +1,7 @@
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import type { Document } from '@langchain/core/documents';
 import { getSupabaseAdmin } from './supabase-admin';
-import { createOpenRouterEmbeddings } from './openrouter-embeddings';
+import { createHuggingFaceEmbeddings } from './openrouter-embeddings';
 
 export type RagRetrieveRequest = {
 	query: string;
@@ -32,15 +32,8 @@ export async function retrieveRagChunks({
 	topK = 6
 }: RagRetrieveRequest): Promise<RagChunkResult[]> {
 	const startedAt = Date.now();
-	console.log('[rag-retrieve] start', {
-		proposalId,
-		round,
-		userId,
-		topK,
-		queryLength: query.length
-	});
 	const supabaseAdmin = getSupabaseAdmin();
-	const embeddings = createOpenRouterEmbeddings();
+	const embeddings = createHuggingFaceEmbeddings();
 	const store = new SupabaseVectorStore(embeddings, {
 		client: supabaseAdmin,
 		tableName: 'document_chunks',
@@ -52,12 +45,7 @@ export async function retrieveRagChunks({
 		round,
 		...(userId ? { user_id: userId } : {})
 	};
-	console.log('[rag-retrieve] similarity search', { filter });
 	const results = await store.similaritySearchWithScore(query, topK, filter);
-	console.log('[rag-retrieve] done', {
-		resultCount: results.length,
-		elapsedMs: Date.now() - startedAt
-	});
 
 	return results.map(([doc, score]) => ({
 		content: doc.pageContent,

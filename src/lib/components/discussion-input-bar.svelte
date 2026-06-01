@@ -210,11 +210,22 @@ inputDisabled = inputDisabled ?? disabled;
 			];
 
 			const storagePath = `${path}/${attachmentId}-${sanitizeFilename(file.name)}`;
-			const { error } = await supabase.storage
+			const { data: uploadData, error } = await supabase.storage
 				.from(DOCUMENTS_BUCKET)
 				.upload(storagePath, file, { upsert: false });
 
+			// Debug logging: record storage upload result
+			console.debug('[uploadFiles] supabase.upload result', {
+				filename: file.name,
+				storagePath,
+				size: file.size,
+				uploadData,
+				error
+			});
+
 			if (error) {
+				// Log the storage error for diagnostics
+				console.error('[uploadFiles] supabase.upload error', error);
 				attachments = attachments.map((attachment) =>
 					attachment.id === attachmentId
 						? { ...attachment, status: 'error', storagePath }
@@ -227,33 +238,58 @@ inputDisabled = inputDisabled ?? disabled;
 						? { ...attachment, status: 'uploaded', storagePath }
 						: attachment
 				);
+				// Call ingest endpoint and log full response for diagnostics
+				let ingestResponse: Response | null = null;
+				let ingestBody: any = null;
+				try {
+					ingestResponse = await fetch('/api/documents/ingest', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							proposalId,
+							round,
+							userId,
+							files: [
+								{
+									storagePath,
+									filename: file.name,
+									mimeType: file.type,
+									sizeBytes: file.size
+								}
+							]
+						})
+					});
+				} catch (fetchErr) {
+					console.error('[uploadFiles] ingest fetch failed', fetchErr);
+					uploadError = String(fetchErr?.message ?? fetchErr);
+					attachments = attachments.map((attachment) =>
+						attachment.id === attachmentId
+							? { ...attachment, status: 'error' }
+							: attachment
+					);
+					continue;
+				}
 
-				const ingestResponse = await fetch('/api/documents/ingest', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						proposalId,
-						round,
-						userId,
-						files: [
-							{
-								storagePath,
-								filename: file.name,
-								mimeType: file.type,
-								sizeBytes: file.size
-							}
-						]
-					})
+				try {
+					ingestBody = await ingestResponse.json().catch(() => null);
+				} catch (parseErr) {
+					console.error('[uploadFiles] failed to parse ingest response', parseErr, { status: ingestResponse?.status });
+				}
+
+				// Debug: log ingest response and body
+				console.debug('[uploadFiles] ingest response', {
+					status: ingestResponse?.status,
+					ok: ingestResponse?.ok,
+					body: ingestBody
 				});
 
-				const ingestBody = await ingestResponse.json().catch(() => null);
 				const failedResult =
 					ingestBody?.results?.find?.(
 						(result: { storagePath: string; status: string; error?: string }) =>
 							result.storagePath === storagePath && result.status === 'failed'
 					) ?? null;
 
-				if (!ingestResponse.ok || ingestBody?.success === false || failedResult) {
+				if (!ingestResponse?.ok || ingestBody?.success === false || failedResult) {
 					const errorCode = failedResult?.error ?? ingestBody?.error;
 					uploadError = mapIngestError(errorCode);
 					attachments = attachments.map((attachment) =>
