@@ -893,7 +893,7 @@
 			playAudio(fanfareAudio);
 			openEndDialog = true;
 			pendingEndDialogTimer = null;
-		}, 2000) as unknown as number;
+		}, 4000) as unknown as number;
 
 		return () => {
 			if (pendingEndDialogTimer) {

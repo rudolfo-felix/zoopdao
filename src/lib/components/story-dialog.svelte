@@ -599,9 +599,6 @@
 								</div>
 							{/if}
 						</div>
-							<p class="font-medium py-1">
-								{getTranslation(ROUNDS[round.index].description)}
-							</p>
 						{#if round.index === currentRound && playerState === 'writing'}
 							{#if round.index !== 7}
 								<div class="relative mb-4">
