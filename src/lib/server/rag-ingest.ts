@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from './supabase-admin';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, extname } from 'node:path';
-import { createOpenRouterEmbeddings } from './openrouter-embeddings';
+import { createHuggingFaceEmbeddings } from './openrouter-embeddings';
 import {
 	RAG_ALLOWED_EXTENSIONS,
 	RAG_MAX_FILE_SIZE_BYTES,
@@ -154,7 +154,7 @@ async function buildChunksFromBuffer(params: {
 		});
 	});
 
-	const embeddings = createOpenRouterEmbeddings();
+	const embeddings = createHuggingFaceEmbeddings();
 	const embeddingsResult = await embeddings.embedDocuments(
 		enrichedChunks.map((doc) => doc.pageContent)
 	);
@@ -176,11 +176,6 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 	const supabaseAdmin = getSupabaseAdmin();
 
 	const results: IngestResult[] = [];
-	console.log('[rag-ingest] start', {
-		proposalId: payload.proposalId,
-		round: payload.round,
-		fileCount: payload.files.length
-	});
 
 	const { count, error: countError } = await supabaseAdmin
 		.from('documents')
@@ -193,23 +188,13 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 	}
 
 	if ((count ?? 0) + payload.files.length > RAG_MAX_FILES_PER_ROUND) {
-		console.log('[rag-ingest] limit exceeded', {
-			currentCount: count ?? 0,
-			incoming: payload.files.length,
-			max: RAG_MAX_FILES_PER_ROUND
-		});
 		throw new Error('upload-limit-exceeded');
 	}
 
 	for (const file of payload.files) {
 		const baseResult: IngestResult = { storagePath: file.storagePath, status: 'failed' };
 		let createdDocumentId: number | null = null;
-		try {
-			console.log('[rag-ingest] file', {
-				filename: file.filename,
-				sizeBytes: file.sizeBytes,
-				storagePath: file.storagePath
-			});
+			try {
 			if (!isSupportedExtension(file.filename)) {
 				results.push({ ...baseResult, error: 'unsupported-file-type' });
 				continue;
@@ -251,7 +236,7 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 				throw new Error(downloadError?.message ?? 'Failed to download document.');
 			}
 
-			console.log('[rag-ingest] downloaded', { documentId: docRow.id });
+			// downloaded file
 
 			const buffer = Buffer.from(await fileData.arrayBuffer());
 			const { rows, chunkCount } = await buildChunksFromBuffer({
@@ -264,10 +249,7 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 				userId: payload.userId
 			});
 
-			console.log('[rag-ingest] chunks built', {
-				documentId: docRow.id,
-				chunkCount
-			});
+			// chunks built
 
 			const { error: chunkError } = await supabaseAdmin.from('document_chunks').insert(rows);
 			if (chunkError) {
@@ -285,9 +267,17 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 				status: 'indexed',
 				chunkCount
 			});
-			console.log('[rag-ingest] indexed', { documentId: docRow.id, chunkCount });
+			// indexed successfully
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
+			// Log full error and stack for diagnostics
+			console.error('[rag-ingest] file processing error', {
+				storagePath: file.storagePath,
+				filename: file.filename,
+				sizeBytes: file.sizeBytes,
+				error,
+				stack: (error as any)?.stack
+			});
 			if (createdDocumentId) {
 				await supabaseAdmin
 					.from('documents')
@@ -295,10 +285,7 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 					.eq('id', createdDocumentId);
 			}
 			results.push({ ...baseResult, error: errorMessage });
-			console.log('[rag-ingest] failed', {
-				storagePath: file.storagePath,
-				error: errorMessage
-			});
+			// processing failed for this file
 		}
 	}
 
@@ -307,10 +294,9 @@ export async function ingestDocuments(payload: IngestRequestPayload): Promise<In
 
 export async function reindexDocument(documentId: number) {
 	const supabaseAdmin = getSupabaseAdmin();
-	console.log('[rag-reindex] start', { documentId });
 	const { data: docRow, error } = await supabaseAdmin
 		.from('documents')
-		.select('id, proposal_id, round, filename, storage_path, metadata')
+ 		.select('id, proposal_id, round, filename, storage_path, metadata, user_id')
 		.eq('id', documentId)
 		.single();
 
@@ -362,7 +348,7 @@ export async function reindexDocument(documentId: number) {
 			.update({ metadata: { status: 'indexed', chunk_count: chunkCount } })
 			.eq('id', docRow.id);
 
-		console.log('[rag-reindex] complete', { documentId: docRow.id, chunkCount });
+		// reindex complete
 		return { documentId: docRow.id, chunkCount };
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error);
@@ -370,26 +356,22 @@ export async function reindexDocument(documentId: number) {
 			.from('documents')
 			.update({ metadata: { status: 'failed', error: errorMessage } })
 			.eq('id', docRow.id);
-		console.log('[rag-reindex] failed', { documentId: docRow.id, error: errorMessage });
+		// reindex failed
 		throw error;
 	}
 }
 
 export async function deleteDocument(params: { documentId?: number; storagePath: string }) {
 	const supabaseAdmin = getSupabaseAdmin();
-	console.log('[rag-delete] start', {
-		documentId: params.documentId,
-		storagePath: params.storagePath
-	});
+	// delete start
 
 	await supabaseAdmin.storage.from(DOCUMENTS_BUCKET).remove([params.storagePath]);
 
 	if (params.documentId) {
 		const { error } = await supabaseAdmin.from('documents').delete().eq('id', params.documentId);
 		if (error) {
-			console.log('[rag-delete] failed', { documentId: params.documentId, error: error.message });
 			throw new Error(error.message);
 		}
 	}
-	console.log('[rag-delete] complete', { documentId: params.documentId });
+	// delete complete
 }
